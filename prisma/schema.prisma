@@ -1,0 +1,92 @@
+// MedCall Database Schema
+// Designed for educational video conferencing with secure attendance tracking
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_DATABASE_URL")
+}
+
+// Users Table - Supports both students and hosts
+model User {
+  id            String   @id @default(cuid())
+  name          String                    // Immutable after registration
+  matricNumber  String   @unique          // Student ID - Immutable and unique
+  email         String   @unique
+  passwordHash  String
+  role          Role     @default(STUDENT)
+  profileLocked Boolean  @default(false)  // Set to true after first login
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  // Relations
+  hostedMeetings Meeting[]        @relation("HostedMeetings")
+  attendances    Attendance[]
+}
+
+enum Role {
+  STUDENT
+  HOST
+  ADMIN
+}
+
+// Meetings Table
+model Meeting {
+  id              String        @id @default(cuid())
+  title           String
+  description     String?
+  hostId          String
+  status          MeetingStatus @default(SCHEDULED)
+  startTime       DateTime      @default(now())
+  endTime         DateTime?
+  meetingCode     String        @unique  // Unique code for students to join
+  allowAttendance Boolean       @default(true)
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  // Relations
+  host        User          @relation("HostedMeetings", fields: [hostId], references: [id])
+  attendances Attendance[]
+
+  @@index([hostId])
+  @@index([meetingCode])
+  @@index([status])
+}
+
+enum MeetingStatus {
+  SCHEDULED
+  LIVE
+  ENDED
+  CANCELLED
+}
+
+// Attendance Table - Secure attendance tracking
+model Attendance {
+  id         String           @id @default(cuid())
+  meetingId  String
+  studentId  String
+  signInTime DateTime         @default(now())  // Server timestamp
+  status     AttendanceStatus @default(PRESENT)
+  ipAddress  String?          // For security logging
+  synced     Boolean          @default(true)   // For offline sync tracking
+  createdAt  DateTime         @default(now())
+
+  // Relations
+  meeting Meeting @relation(fields: [meetingId], references: [id], onDelete: Cascade)
+  student User    @relation(fields: [studentId], references: [id])
+
+  // Unique constraint - One attendance per student per meeting
+  @@unique([meetingId, studentId])
+  @@index([meetingId])
+  @@index([studentId])
+}
+
+enum AttendanceStatus {
+  PRESENT
+  LATE
+  EXCUSED
+}

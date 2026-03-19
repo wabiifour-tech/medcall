@@ -1,0 +1,49 @@
+{
+  "name": "MedCall",
+  "short_name": "MedCall",
+  "description": "Resilient video conferencing platform for educational environments",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0f172a",
+  "theme_color": "#10b981",
+  "orientation": "any",
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["education", "productivity", "utilities"],
+  "screenshots": [
+    {
+      "src": "/screenshot-1.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Join Meeting",
+      "short_name": "Join",
+      "description": "Join a meeting with a code",
+      "url": "/?action=join"
+    },
+    {
+      "name": "Create Meeting",
+      "short_name": "Create",
+      "description": "Create a new meeting (Hosts only)",
+      "url": "/?action=create"
+    }
+  ],
+  "related_applications": [],
+  "prefer_related_applications": false
+}
